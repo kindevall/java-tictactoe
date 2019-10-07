@@ -3,6 +3,7 @@ A course assignment/projectwork I made a year ago for "Introduction to programmi
 
 AUTHOR
 	Kalle Lindevall
+	2018
 
 TO COMPILE AND RUN
 	javac src/TicTacToe.java
