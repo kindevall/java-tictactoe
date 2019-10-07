@@ -8,3 +8,5 @@ AUTHOR
 TO COMPILE AND RUN
 	javac src/TicTacToe.java
 	java src/TicTacToe
+
+More documentation in doc/TicTacToe.html
