@@ -1,0 +1,720 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../stylesheet.css" title="Style">
+</head>
+<body>
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span>import java.util.*;<a name="line.1"></a>
+<span class="sourceLineNo">002</span><a name="line.2"></a>
+<span class="sourceLineNo">003</span>/**<a name="line.3"></a>
+<span class="sourceLineNo">004</span> * TicTacToe - The class performs an ASCII graphic tic-tac-toe game with dynamic gameboard size against an AI player.<a name="line.4"></a>
+<span class="sourceLineNo">005</span> *<a name="line.5"></a>
+<span class="sourceLineNo">006</span> * @author Kalle Lindevall<a name="line.6"></a>
+<span class="sourceLineNo">007</span> * @version 2018.1.01<a name="line.7"></a>
+<span class="sourceLineNo">008</span> */<a name="line.8"></a>
+<span class="sourceLineNo">009</span>class TicTacToe {<a name="line.9"></a>
+<span class="sourceLineNo">010</span><a name="line.10"></a>
+<span class="sourceLineNo">011</span>    // Variables used for gameboard size management and comparison.<a name="line.11"></a>
+<span class="sourceLineNo">012</span>    public static int gameboardWidth = NewGame();<a name="line.12"></a>
+<span class="sourceLineNo">013</span>    public static int gameboardHeight = BoardHeight();<a name="line.13"></a>
+<span class="sourceLineNo">014</span>    // The gameboard size is automatically adjusted from the two values received .above<a name="line.14"></a>
+<span class="sourceLineNo">015</span>    public static char [][] Gameboard = new char[gameboardHeight][gameboardWidth];<a name="line.15"></a>
+<span class="sourceLineNo">016</span>    // Variables used for marking the gameboard and determining wins.<a name="line.16"></a>
+<span class="sourceLineNo">017</span>    public static int markRequired = 0;<a name="line.17"></a>
+<span class="sourceLineNo">018</span>    public static char markEmpty = '-';<a name="line.18"></a>
+<span class="sourceLineNo">019</span>    public static char markPlayer = 'X';<a name="line.19"></a>
+<span class="sourceLineNo">020</span>    public static char markCPU = 'O';<a name="line.20"></a>
+<span class="sourceLineNo">021</span>    public static int markRow = 0;<a name="line.21"></a>
+<span class="sourceLineNo">022</span>    public static int markCol = 0;<a name="line.22"></a>
+<span class="sourceLineNo">023</span>    // Variables that end the game/keep it going.<a name="line.23"></a>
+<span class="sourceLineNo">024</span>    public static boolean hasWon = false;<a name="line.24"></a>
+<span class="sourceLineNo">025</span>    public static boolean isDraw = false;<a name="line.25"></a>
+<span class="sourceLineNo">026</span><a name="line.26"></a>
+<span class="sourceLineNo">027</span>    /**<a name="line.27"></a>
+<span class="sourceLineNo">028</span>     * Starts the game and keeps it running until a winner is found or the gameboard is full. Later announces the winner.<a name="line.28"></a>
+<span class="sourceLineNo">029</span>     * @param args the command line arguments<a name="line.29"></a>
+<span class="sourceLineNo">030</span>     */<a name="line.30"></a>
+<span class="sourceLineNo">031</span>    public static void main(String [] args) {<a name="line.31"></a>
+<span class="sourceLineNo">032</span><a name="line.32"></a>
+<span class="sourceLineNo">033</span><a name="line.33"></a>
+<span class="sourceLineNo">034</span>        // NOTE: The code is filled with line breaks (System.out.println(); with nothing to print), for the sake of appeal and readability of the output.<a name="line.34"></a>
+<span class="sourceLineNo">035</span><a name="line.35"></a>
+<span class="sourceLineNo">036</span><a name="line.36"></a>
+<span class="sourceLineNo">037</span>        MarkAmount(gameboardWidth, gameboardHeight);<a name="line.37"></a>
+<span class="sourceLineNo">038</span>        PrintNewGameboard();<a name="line.38"></a>
+<span class="sourceLineNo">039</span><a name="line.39"></a>
+<span class="sourceLineNo">040</span>        System.out.println();<a name="line.40"></a>
+<span class="sourceLineNo">041</span>        System.out.println("Let's start the game!");<a name="line.41"></a>
+<span class="sourceLineNo">042</span>        System.out.println();<a name="line.42"></a>
+<span class="sourceLineNo">043</span>        // A delay (of 1000 milliseconds = 1 second) to help with the pacing and the readability of the output. Also found later in code with different values.<a name="line.43"></a>
+<span class="sourceLineNo">044</span>        Wait(1000);<a name="line.44"></a>
+<span class="sourceLineNo">045</span>        // Loops the game via PlayGame() until a win or a tie isn't found.<a name="line.45"></a>
+<span class="sourceLineNo">046</span>        // Upon finding a victory/tie, ends the game and the end result is printed out.<a name="line.46"></a>
+<span class="sourceLineNo">047</span>        do {<a name="line.47"></a>
+<span class="sourceLineNo">048</span>            // Contains the player and computer turns + victory checking.<a name="line.48"></a>
+<span class="sourceLineNo">049</span>            PlayGame();<a name="line.49"></a>
+<span class="sourceLineNo">050</span>            // CheckWins() sets a char value for the variable "win".<a name="line.50"></a>
+<span class="sourceLineNo">051</span>            char win = CheckWins();<a name="line.51"></a>
+<span class="sourceLineNo">052</span>            // When the "win" variable is set as the mark of one of the players, the game ends.<a name="line.52"></a>
+<span class="sourceLineNo">053</span>            if (win != markEmpty) {<a name="line.53"></a>
+<span class="sourceLineNo">054</span>                hasWon = true;<a name="line.54"></a>
+<span class="sourceLineNo">055</span>                // If "win" receives a mark of the human player, the game ends with an announcement of player victory.<a name="line.55"></a>
+<span class="sourceLineNo">056</span>                if (win == markPlayer) {<a name="line.56"></a>
+<span class="sourceLineNo">057</span>                    System.out.println();<a name="line.57"></a>
+<span class="sourceLineNo">058</span>                    System.out.println("+--------------------------------------------------+");<a name="line.58"></a>
+<span class="sourceLineNo">059</span>                    System.out.println("|           The player has won the game!           |");<a name="line.59"></a>
+<span class="sourceLineNo">060</span>                    System.out.println("+--------------------------------------------------+");<a name="line.60"></a>
+<span class="sourceLineNo">061</span>                // If "win" receives a mark of the computer player, the game ends with an announcement of computer victory.<a name="line.61"></a>
+<span class="sourceLineNo">062</span>                } else if (win == markCPU) {<a name="line.62"></a>
+<span class="sourceLineNo">063</span>                    System.out.println();<a name="line.63"></a>
+<span class="sourceLineNo">064</span>                    System.out.println("+--------------------------------------------------+");<a name="line.64"></a>
+<span class="sourceLineNo">065</span>                    System.out.println("|     The computer has (somehow) won the game!     |");<a name="line.65"></a>
+<span class="sourceLineNo">066</span>                    System.out.println("+--------------------------------------------------+");<a name="line.66"></a>
+<span class="sourceLineNo">067</span>                }<a name="line.67"></a>
+<span class="sourceLineNo">068</span>            }<a name="line.68"></a>
+<span class="sourceLineNo">069</span>            // If "isDraw" is true and no wins have been found, the game ends with an announcement of a tie.<a name="line.69"></a>
+<span class="sourceLineNo">070</span>            if (isDraw &amp;&amp; !hasWon) {<a name="line.70"></a>
+<span class="sourceLineNo">071</span>                System.out.println();<a name="line.71"></a>
+<span class="sourceLineNo">072</span>                System.out.println("+--------------------------------------------------+");<a name="line.72"></a>
+<span class="sourceLineNo">073</span>                System.out.println("|              The game ends in a tie!             |");<a name="line.73"></a>
+<span class="sourceLineNo">074</span>                System.out.println("+--------------------------------------------------+");<a name="line.74"></a>
+<span class="sourceLineNo">075</span>            }<a name="line.75"></a>
+<span class="sourceLineNo">076</span>        } while (!isDraw &amp;&amp; !hasWon);<a name="line.76"></a>
+<span class="sourceLineNo">077</span>    }<a name="line.77"></a>
+<span class="sourceLineNo">078</span><a name="line.78"></a>
+<span class="sourceLineNo">079</span>    /**<a name="line.79"></a>
+<span class="sourceLineNo">080</span>     * Prints out the rules for the game and then starts the adjustments for the gameboard size, starting by asking an input for the width of the gameboard.<a name="line.80"></a>
+<span class="sourceLineNo">081</span>     * @return width for the gameboard<a name="line.81"></a>
+<span class="sourceLineNo">082</span>     */<a name="line.82"></a>
+<span class="sourceLineNo">083</span>    public static int NewGame() { <a name="line.83"></a>
+<span class="sourceLineNo">084</span><a name="line.84"></a>
+<span class="sourceLineNo">085</span>        System.out.println();<a name="line.85"></a>
+<span class="sourceLineNo">086</span>        System.out.println("+--------------------------------------------------+");<a name="line.86"></a>
+<span class="sourceLineNo">087</span>        System.out.println("|          Let's play a game: TIC-TAC-TOE          |");<a name="line.87"></a>
+<span class="sourceLineNo">088</span>        System.out.println("+--------------------------------------------------+");<a name="line.88"></a>
+<span class="sourceLineNo">089</span>        // A delay of 1000 milliseconds = 1 second.<a name="line.89"></a>
+<span class="sourceLineNo">090</span>        Wait(1000);<a name="line.90"></a>
+<span class="sourceLineNo">091</span>        System.out.println();<a name="line.91"></a>
+<span class="sourceLineNo">092</span>        System.out.println("RULES:");<a name="line.92"></a>
+<span class="sourceLineNo">093</span>        // A delay of 1000 milliseconds = 1 second.<a name="line.93"></a>
+<span class="sourceLineNo">094</span>        Wait(1000);<a name="line.94"></a>
+<span class="sourceLineNo">095</span>        System.out.println();<a name="line.95"></a>
+<span class="sourceLineNo">096</span>        System.out.println("The player, X, takes turns against the computer, O, marking the spaces on a gameboard.");<a name="line.96"></a>
+<span class="sourceLineNo">097</span>        System.out.println("The size of the gameboard is input by the user, and the minimum size for it is 3x3.");<a name="line.97"></a>
+<span class="sourceLineNo">098</span>        System.out.println("The first player to put user defined amount of marks in a horizontal, vertical, or diagonal line wins the game.");<a name="line.98"></a>
+<span class="sourceLineNo">099</span>        System.out.println();<a name="line.99"></a>
+<span class="sourceLineNo">100</span>        System.out.println();<a name="line.100"></a>
+<span class="sourceLineNo">101</span>        // A delay of 6000 millisecond = 6 seconds.<a name="line.101"></a>
+<span class="sourceLineNo">102</span>        Wait(6000);<a name="line.102"></a>
+<span class="sourceLineNo">103</span>        // Notifies the player, that gameboards larger or equal to 10x10 are usually played with 5 marks to win.<a name="line.103"></a>
+<span class="sourceLineNo">104</span>        System.out.println("NOTE:");<a name="line.104"></a>
+<span class="sourceLineNo">105</span>        // A delay of 1000 milliseconds = 1 second.<a name="line.105"></a>
+<span class="sourceLineNo">106</span>        Wait(1000);<a name="line.106"></a>
+<span class="sourceLineNo">107</span>        System.out.println();<a name="line.107"></a>
+<span class="sourceLineNo">108</span>        System.out.println("If the size of the gameboard is 10x10 or larger, it is recommended");<a name="line.108"></a>
+<span class="sourceLineNo">109</span>        System.out.println("to set the amount of marks required to win to be at least 5.");<a name="line.109"></a>
+<span class="sourceLineNo">110</span>        System.out.println();<a name="line.110"></a>
+<span class="sourceLineNo">111</span>        // A delay of 3000 milliseconds = 3 seconds.<a name="line.111"></a>
+<span class="sourceLineNo">112</span>        Wait(3000);<a name="line.112"></a>
+<span class="sourceLineNo">113</span>        System.out.println();<a name="line.113"></a>
+<span class="sourceLineNo">114</span>        System.out.println("Let's start by adjusting the gameboard size.");<a name="line.114"></a>
+<span class="sourceLineNo">115</span>        System.out.println();<a name="line.115"></a>
+<span class="sourceLineNo">116</span>        // A delay of 1500 milliseconds = 1.5 seconds.<a name="line.116"></a>
+<span class="sourceLineNo">117</span><a name="line.117"></a>
+<span class="sourceLineNo">118</span><a name="line.118"></a>
+<span class="sourceLineNo">119</span>        // NOTE: After this, later occurrences of Wait() appear without additional commentation. The functionality of the method should be clear by now.<a name="line.119"></a>
+<span class="sourceLineNo">120</span><a name="line.120"></a>
+<span class="sourceLineNo">121</span>        <a name="line.121"></a>
+<span class="sourceLineNo">122</span>        Wait(1500);<a name="line.122"></a>
+<span class="sourceLineNo">123</span>        System.out.println("First, input the width for the gameboard:");<a name="line.123"></a>
+<span class="sourceLineNo">124</span>        // Note: the minimum size for the gameboard is 3x3.<a name="line.124"></a>
+<span class="sourceLineNo">125</span>        System.out.println("(Minimum: 3)");<a name="line.125"></a>
+<span class="sourceLineNo">126</span>        // The value for the gameboard witdth is sent as parameters to, and received from, a method in the Validate class.<a name="line.126"></a>
+<span class="sourceLineNo">127</span>        // (Methods in the Validate class validate user input as whole numbers.)<a name="line.127"></a>
+<span class="sourceLineNo">128</span>        gameboardWidth = Validate.numBoard(gameboardWidth);<a name="line.128"></a>
+<span class="sourceLineNo">129</span>        // A value for gameboardWidth is returned. Later the size for the gameboard is automatically determined from the size values received.<a name="line.129"></a>
+<span class="sourceLineNo">130</span>        return gameboardWidth;<a name="line.130"></a>
+<span class="sourceLineNo">131</span>    }<a name="line.131"></a>
+<span class="sourceLineNo">132</span><a name="line.132"></a>
+<span class="sourceLineNo">133</span>    /**<a name="line.133"></a>
+<span class="sourceLineNo">134</span>     * Asks user input for the height of the gameboard.<a name="line.134"></a>
+<span class="sourceLineNo">135</span>     * @return height for the gameboard<a name="line.135"></a>
+<span class="sourceLineNo">136</span>     */<a name="line.136"></a>
+<span class="sourceLineNo">137</span>    public static int BoardHeight() {<a name="line.137"></a>
+<span class="sourceLineNo">138</span><a name="line.138"></a>
+<span class="sourceLineNo">139</span>        System.out.println("Then the height for the gameboard:");<a name="line.139"></a>
+<span class="sourceLineNo">140</span>        // Note: the minimum size for the gameboard is 3x3.<a name="line.140"></a>
+<span class="sourceLineNo">141</span>        System.out.println("(Minimum: 3)");<a name="line.141"></a>
+<span class="sourceLineNo">142</span>        // The value for the gameboard height is sent as paremeters to, and received from, a method in the Validate class.<a name="line.142"></a>
+<span class="sourceLineNo">143</span>        // (Methods in the Validate class validate user input as whole numbers.)<a name="line.143"></a>
+<span class="sourceLineNo">144</span>        gameboardHeight = Validate.numBoard(gameboardHeight);<a name="line.144"></a>
+<span class="sourceLineNo">145</span>        // A value for gameboardHeight is returned. Later the size for the gameboard is automatically determined from the size values received.<a name="line.145"></a>
+<span class="sourceLineNo">146</span>        return gameboardHeight;<a name="line.146"></a>
+<span class="sourceLineNo">147</span>    }<a name="line.147"></a>
+<span class="sourceLineNo">148</span><a name="line.148"></a>
+<span class="sourceLineNo">149</span>    /**<a name="line.149"></a>
+<span class="sourceLineNo">150</span>     * Asks user input for the amount of marks required to win the game.<a name="line.150"></a>
+<span class="sourceLineNo">151</span>     * @param gameboardWidth value of the width of the gameboard, that is compared to the value of the height<a name="line.151"></a>
+<span class="sourceLineNo">152</span>     * @param gameboardHeight value of the height of the gameboard, that is compared to the value of the width<a name="line.152"></a>
+<span class="sourceLineNo">153</span>     * @return the amount of marks required to win the game<a name="line.153"></a>
+<span class="sourceLineNo">154</span>     */<a name="line.154"></a>
+<span class="sourceLineNo">155</span>    public static int MarkAmount(int gameboardWidth, int gameboardHeight) {<a name="line.155"></a>
+<span class="sourceLineNo">156</span>        // The value of the shorter side of the gameboard<a name="line.156"></a>
+<span class="sourceLineNo">157</span>        int shorter = 0;<a name="line.157"></a>
+<span class="sourceLineNo">158</span>        // Compares the values of the width and height of the gameboard, determining which value is smaller.<a name="line.158"></a>
+<span class="sourceLineNo">159</span>        if (gameboardWidth &lt; gameboardHeight) {<a name="line.159"></a>
+<span class="sourceLineNo">160</span>            shorter = gameboardWidth;<a name="line.160"></a>
+<span class="sourceLineNo">161</span>        } else {<a name="line.161"></a>
+<span class="sourceLineNo">162</span>            shorter = gameboardHeight;<a name="line.162"></a>
+<span class="sourceLineNo">163</span>        }        <a name="line.163"></a>
+<span class="sourceLineNo">164</span>        System.out.println("Now input the amount of marks required to win:");<a name="line.164"></a>
+<span class="sourceLineNo">165</span>        // If user has set the size for gameboard as 10x10 or larger, the output suggests the value for the marks required to win to be at least 5.<a name="line.165"></a>
+<span class="sourceLineNo">166</span>        // Minimum value is 3, as the minimum width/height is also 3.<a name="line.166"></a>
+<span class="sourceLineNo">167</span>        if (gameboardWidth &gt;= 10 &amp;&amp; gameboardHeight &gt;= 10) {<a name="line.167"></a>
+<span class="sourceLineNo">168</span>            System.out.println("(Minimum: 3 / Maximum: " + shorter + " / Recommended: 5+)");<a name="line.168"></a>
+<span class="sourceLineNo">169</span>        } else {<a name="line.169"></a>
+<span class="sourceLineNo">170</span>        System.out.println("(Minimum: 3 / Maximum: " + shorter + ")");<a name="line.170"></a>
+<span class="sourceLineNo">171</span>        }<a name="line.171"></a>
+<span class="sourceLineNo">172</span>        // The value for the marks required to win is sent as parameters to, and received from, a method in the Validate class.<a name="line.172"></a>
+<span class="sourceLineNo">173</span>        // (Methods in the Validate class validate user input as whole numbers.)<a name="line.173"></a>
+<span class="sourceLineNo">174</span>        //<a name="line.174"></a>
+<span class="sourceLineNo">175</span>        // Also sends the values of the gameboard width and height as parameters for the means of comparison,<a name="line.175"></a>
+<span class="sourceLineNo">176</span>        // this way the value for the marks required to win can't be larger than the width or the height.<a name="line.176"></a>
+<span class="sourceLineNo">177</span>        markRequired = Validate.numMark(markRequired, gameboardWidth, gameboardHeight);<a name="line.177"></a>
+<span class="sourceLineNo">178</span>        // A value for the marks required to win is returned.<a name="line.178"></a>
+<span class="sourceLineNo">179</span>        return markRequired;<a name="line.179"></a>
+<span class="sourceLineNo">180</span>    }<a name="line.180"></a>
+<span class="sourceLineNo">181</span><a name="line.181"></a>
+<span class="sourceLineNo">182</span>    /**<a name="line.182"></a>
+<span class="sourceLineNo">183</span>     * First fills the gameboard with '-' (markEmpty), then prints out the board.<a name="line.183"></a>
+<span class="sourceLineNo">184</span>     */<a name="line.184"></a>
+<span class="sourceLineNo">185</span>    public static void PrintNewGameboard() {<a name="line.185"></a>
+<span class="sourceLineNo">186</span><a name="line.186"></a>
+<span class="sourceLineNo">187</span>        // Fills the gameboard 2D array with '-'.<a name="line.187"></a>
+<span class="sourceLineNo">188</span>        for (int x = 0; x &lt; gameboardHeight; x++) {    <a name="line.188"></a>
+<span class="sourceLineNo">189</span>            for (int y = 0; y &lt; gameboardWidth; y++) {  <a name="line.189"></a>
+<span class="sourceLineNo">190</span>                    Gameboard[x][y] = markEmpty;<a name="line.190"></a>
+<span class="sourceLineNo">191</span>            }<a name="line.191"></a>
+<span class="sourceLineNo">192</span>        }<a name="line.192"></a>
+<span class="sourceLineNo">193</span>        System.out.println();<a name="line.193"></a>
+<span class="sourceLineNo">194</span>        System.out.println("HERE'S THE GAMEBOARD:");<a name="line.194"></a>
+<span class="sourceLineNo">195</span>        System.out.println();<a name="line.195"></a>
+<span class="sourceLineNo">196</span>        Wait(500);<a name="line.196"></a>
+<span class="sourceLineNo">197</span>        // Prints out the gameboard 2D array.<a name="line.197"></a>
+<span class="sourceLineNo">198</span>        for (int x = 0; x &lt; Gameboard.length; x++) {<a name="line.198"></a>
+<span class="sourceLineNo">199</span>            System.out.print(" ");<a name="line.199"></a>
+<span class="sourceLineNo">200</span>            for (int y = 0; y &lt; Gameboard[x].length; y++) {<a name="line.200"></a>
+<span class="sourceLineNo">201</span>                System.out.print(Gameboard[x][y] + " ");<a name="line.201"></a>
+<span class="sourceLineNo">202</span>            }<a name="line.202"></a>
+<span class="sourceLineNo">203</span>            System.out.println();<a name="line.203"></a>
+<span class="sourceLineNo">204</span>        }  <a name="line.204"></a>
+<span class="sourceLineNo">205</span>        // Additional output to remind the player of the size of the gameboard and the amount of marks required to win the game.<a name="line.205"></a>
+<span class="sourceLineNo">206</span>        System.out.println();<a name="line.206"></a>
+<span class="sourceLineNo">207</span>        System.out.println("WIDTH: " + gameboardWidth + "  |  HEIGHT: " + gameboardHeight + "  |  MARKS TO WIN: " + markRequired);<a name="line.207"></a>
+<span class="sourceLineNo">208</span>        Wait(2000);<a name="line.208"></a>
+<span class="sourceLineNo">209</span>    }<a name="line.209"></a>
+<span class="sourceLineNo">210</span><a name="line.210"></a>
+<span class="sourceLineNo">211</span>    /**<a name="line.211"></a>
+<span class="sourceLineNo">212</span>     * Runs the methods for the player turn and the computer turn. Checks for wins after each turn.<a name="line.212"></a>
+<span class="sourceLineNo">213</span>     */<a name="line.213"></a>
+<span class="sourceLineNo">214</span>    public static void PlayGame() {<a name="line.214"></a>
+<span class="sourceLineNo">215</span>        System.out.println();<a name="line.215"></a>
+<span class="sourceLineNo">216</span>        System.out.println("+-------------------------+");<a name="line.216"></a>
+<span class="sourceLineNo">217</span>        System.out.println("|       PLAYER TURN       |");<a name="line.217"></a>
+<span class="sourceLineNo">218</span>        System.out.println("+-------------------------+");<a name="line.218"></a>
+<span class="sourceLineNo">219</span>        MovePlayer();<a name="line.219"></a>
+<span class="sourceLineNo">220</span>        CheckWins();<a name="line.220"></a>
+<span class="sourceLineNo">221</span>        Wait(1000);<a name="line.221"></a>
+<span class="sourceLineNo">222</span>        // As the human player is the first to play, if the player makes the winning move or the gameboard fills up, no more computer turns are played out.<a name="line.222"></a>
+<span class="sourceLineNo">223</span>        if (!FullBoard() &amp;&amp; !hasWon) {<a name="line.223"></a>
+<span class="sourceLineNo">224</span>            System.out.println();<a name="line.224"></a>
+<span class="sourceLineNo">225</span>            System.out.println("+-------------------------+");<a name="line.225"></a>
+<span class="sourceLineNo">226</span>            System.out.println("|      COMPUTER TURN      |");<a name="line.226"></a>
+<span class="sourceLineNo">227</span>            System.out.println("+-------------------------+");<a name="line.227"></a>
+<span class="sourceLineNo">228</span>            Wait(500);<a name="line.228"></a>
+<span class="sourceLineNo">229</span>            MoveCPU();<a name="line.229"></a>
+<span class="sourceLineNo">230</span>            CheckWins();<a name="line.230"></a>
+<span class="sourceLineNo">231</span>            Wait(1000);<a name="line.231"></a>
+<span class="sourceLineNo">232</span>        }<a name="line.232"></a>
+<span class="sourceLineNo">233</span>    }<a name="line.233"></a>
+<span class="sourceLineNo">234</span><a name="line.234"></a>
+<span class="sourceLineNo">235</span>    /**<a name="line.235"></a>
+<span class="sourceLineNo">236</span>     * The human player's turn. Asks the input for the coordinates for the player mark 'X'.<a name="line.236"></a>
+<span class="sourceLineNo">237</span>     */<a name="line.237"></a>
+<span class="sourceLineNo">238</span>    public static void MovePlayer() {<a name="line.238"></a>
+<span class="sourceLineNo">239</span>        // Later used as an identifier which player's turn it was.<a name="line.239"></a>
+<span class="sourceLineNo">240</span>        int player = 0;<a name="line.240"></a>
+<span class="sourceLineNo">241</span>        System.out.println();<a name="line.241"></a>
+<span class="sourceLineNo">242</span>        System.out.print("Select the row for your mark ( 1 - " + gameboardHeight + " ): ");<a name="line.242"></a>
+<span class="sourceLineNo">243</span>        // The row coordinate value for the player's mark is sent as parameters to, and received from, a method in the Validate class.<a name="line.243"></a>
+<span class="sourceLineNo">244</span>        // (Methods in the Validate class validate user input as whole numbers.)<a name="line.244"></a>
+<span class="sourceLineNo">245</span>        markRow = Validate.numPlay(markRow, gameboardHeight);<a name="line.245"></a>
+<span class="sourceLineNo">246</span><a name="line.246"></a>
+<span class="sourceLineNo">247</span>        System.out.print("Select the column for your mark ( 1 - " + gameboardWidth + " ): ");<a name="line.247"></a>
+<span class="sourceLineNo">248</span>        // The column coordinate value for the player's mark is sent as parameters to, and received from, a method in the Validate class.<a name="line.248"></a>
+<span class="sourceLineNo">249</span>        // (Methods in the Validate class validate user input as whole numbers.)<a name="line.249"></a>
+<span class="sourceLineNo">250</span>        markCol = Validate.numPlay(markCol, gameboardWidth);<a name="line.250"></a>
+<span class="sourceLineNo">251</span>        // Starts PrintUpdatedGameboard() with the player identifier and the coordinates for the human player's mark as parameters.<a name="line.251"></a>
+<span class="sourceLineNo">252</span>        PrintUpdatedGameboard(player, markRow, markCol);<a name="line.252"></a>
+<span class="sourceLineNo">253</span>        // Row and column coordinates are reset, ready for the next turn.<a name="line.253"></a>
+<span class="sourceLineNo">254</span>        markRow = 0;<a name="line.254"></a>
+<span class="sourceLineNo">255</span>        markCol = 0;<a name="line.255"></a>
+<span class="sourceLineNo">256</span>    }<a name="line.256"></a>
+<span class="sourceLineNo">257</span><a name="line.257"></a>
+<span class="sourceLineNo">258</span>    /**<a name="line.258"></a>
+<span class="sourceLineNo">259</span>     * The computer player's turn. Randomizes the values of the coordinates for the computer player mark 'O'.<a name="line.259"></a>
+<span class="sourceLineNo">260</span>     */<a name="line.260"></a>
+<span class="sourceLineNo">261</span>    public static void MoveCPU() {<a name="line.261"></a>
+<span class="sourceLineNo">262</span>        // Later used as an identifier which player's turn it was.<a name="line.262"></a>
+<span class="sourceLineNo">263</span>        int player = 1;<a name="line.263"></a>
+<span class="sourceLineNo">264</span>        // The coordinates for the computer player's mark are generated from Math.random,<a name="line.264"></a>
+<span class="sourceLineNo">265</span>        // then multiplied with either the gameboards width (column coordinate) or the height (row coordinate).<a name="line.265"></a>
+<span class="sourceLineNo">266</span>        int markCol = (int) (Math.random() * gameboardWidth +1);<a name="line.266"></a>
+<span class="sourceLineNo">267</span>        int markRow = (int) (Math.random() * gameboardHeight +1);<a name="line.267"></a>
+<span class="sourceLineNo">268</span>        // Starts PrintUpdatedGameboard() with the player identifier and the coordinates for the computer player's mark as parameters.<a name="line.268"></a>
+<span class="sourceLineNo">269</span>        PrintUpdatedGameboard(player, markRow, markCol);<a name="line.269"></a>
+<span class="sourceLineNo">270</span>        // Row and column coordinates are reset, ready for the next turn.<a name="line.270"></a>
+<span class="sourceLineNo">271</span>        markRow = 0;<a name="line.271"></a>
+<span class="sourceLineNo">272</span>        markCol = 0;<a name="line.272"></a>
+<span class="sourceLineNo">273</span>    }<a name="line.273"></a>
+<span class="sourceLineNo">274</span><a name="line.274"></a>
+<span class="sourceLineNo">275</span>    /**<a name="line.275"></a>
+<span class="sourceLineNo">276</span>     * Prints the gameboard with the human and the computer player's marks updated in it.<a name="line.276"></a>
+<span class="sourceLineNo">277</span>     * @param whichPlayer used as an identifier to determine which player's mark to put on the board<a name="line.277"></a>
+<span class="sourceLineNo">278</span>     * @param markRow height/row coordinate for the player's mark, used to put the mark in the correct coordinates<a name="line.278"></a>
+<span class="sourceLineNo">279</span>     * @param markCol width/column coordinate for the player's mark, used to put the mark in the correct coordinates<a name="line.279"></a>
+<span class="sourceLineNo">280</span>     */<a name="line.280"></a>
+<span class="sourceLineNo">281</span>    public static void PrintUpdatedGameboard(int whichPlayer, int markRow, int markCol) {<a name="line.281"></a>
+<span class="sourceLineNo">282</span><a name="line.282"></a>
+<span class="sourceLineNo">283</span>        System.out.println();<a name="line.283"></a>
+<span class="sourceLineNo">284</span>        // If it was the human player's turn.<a name="line.284"></a>
+<span class="sourceLineNo">285</span>        if (whichPlayer == 0) {<a name="line.285"></a>
+<span class="sourceLineNo">286</span>            // A labelled loop (making it easier to just jump out of the loop), <a name="line.286"></a>
+<span class="sourceLineNo">287</span>            // that goes through the gameboard with for-loops to find the coordinates the player input.<a name="line.287"></a>
+<span class="sourceLineNo">288</span>            boardloop:<a name="line.288"></a>
+<span class="sourceLineNo">289</span>            for (int x = 0; x &lt; gameboardHeight; x++) {<a name="line.289"></a>
+<span class="sourceLineNo">290</span>                for (int y = 0; y &lt; gameboardWidth; y++) {<a name="line.290"></a>
+<span class="sourceLineNo">291</span>                    // If there's already a player's mark in the coordinates, proceeds to ask for new values.<a name="line.291"></a>
+<span class="sourceLineNo">292</span>                    // (For so long, that the player inputs valid coordinates.)<a name="line.292"></a>
+<span class="sourceLineNo">293</span>                    if (Gameboard[markRow-1][markCol-1] == markPlayer || Gameboard[markRow-1][markCol-1] == markCPU) {<a name="line.293"></a>
+<span class="sourceLineNo">294</span>                        do {<a name="line.294"></a>
+<span class="sourceLineNo">295</span>                            // The values are again reset.<a name="line.295"></a>
+<span class="sourceLineNo">296</span>                            markRow = 0;<a name="line.296"></a>
+<span class="sourceLineNo">297</span>                            markCol = 0;<a name="line.297"></a>
+<span class="sourceLineNo">298</span>                            System.out.println("ERROR: There is already a mark in that position, input new coordinates.");<a name="line.298"></a>
+<span class="sourceLineNo">299</span>                            System.out.print("Select a new row for your mark ( 1 - " + gameboardHeight + " ): ");<a name="line.299"></a>
+<span class="sourceLineNo">300</span>                            // Again using a method in the Validate class to check for a whole number.<a name="line.300"></a>
+<span class="sourceLineNo">301</span>                            markRow = Validate.numPlay(markRow, gameboardHeight);<a name="line.301"></a>
+<span class="sourceLineNo">302</span>                            // Again using a method in the Validate class to check for a whole number.<a name="line.302"></a>
+<span class="sourceLineNo">303</span>                            System.out.print("Select a new column for your mark ( 1 - " + gameboardWidth + " ): ");<a name="line.303"></a>
+<span class="sourceLineNo">304</span>                            markCol = Validate.numPlay(markCol, gameboardWidth);<a name="line.304"></a>
+<span class="sourceLineNo">305</span>                                <a name="line.305"></a>
+<span class="sourceLineNo">306</span>                        } while (Gameboard[markRow-1][markCol-1] == markPlayer || Gameboard[markRow-1][markCol-1] == markCPU);<a name="line.306"></a>
+<span class="sourceLineNo">307</span>                    } else {<a name="line.307"></a>
+<span class="sourceLineNo">308</span>                    // If correct coordinate values are input, player's mark is placed on the specified coordinates.<a name="line.308"></a>
+<span class="sourceLineNo">309</span>                    Gameboard[markRow-1][markCol-1] = markPlayer;<a name="line.309"></a>
+<span class="sourceLineNo">310</span>                    // Breaks the loop.<a name="line.310"></a>
+<span class="sourceLineNo">311</span>                    break boardloop;<a name="line.311"></a>
+<span class="sourceLineNo">312</span>                    }<a name="line.312"></a>
+<span class="sourceLineNo">313</span>                }<a name="line.313"></a>
+<span class="sourceLineNo">314</span>            }<a name="line.314"></a>
+<span class="sourceLineNo">315</span>        // The computer player's turn.<a name="line.315"></a>
+<span class="sourceLineNo">316</span>        } else {<a name="line.316"></a>
+<span class="sourceLineNo">317</span>            // An identical loop as the human player loop, to check through the gameboard array.<a name="line.317"></a>
+<span class="sourceLineNo">318</span>            // (The only thing that differs, is the contents inside the if-else and the mark to place.)<a name="line.318"></a>
+<span class="sourceLineNo">319</span>            boardloop:<a name="line.319"></a>
+<span class="sourceLineNo">320</span>            for (int x = 0; x &lt; gameboardHeight; x++) {<a name="line.320"></a>
+<span class="sourceLineNo">321</span>                for (int y = 0; y &lt; gameboardWidth; y++) {<a name="line.321"></a>
+<span class="sourceLineNo">322</span>                    if (Gameboard[markRow-1][markCol-1] == markPlayer || Gameboard[markRow-1][markCol-1] == markCPU) {<a name="line.322"></a>
+<span class="sourceLineNo">323</span>                        System.out.println("The computer had a glitch and tried to place their mark on an occupied spot.");<a name="line.323"></a>
+<span class="sourceLineNo">324</span>                        System.out.println();<a name="line.324"></a>
+<span class="sourceLineNo">325</span>                        Wait(1500);<a name="line.325"></a>
+<span class="sourceLineNo">326</span>                        do {<a name="line.326"></a>
+<span class="sourceLineNo">327</span>                            markRow = 0;<a name="line.327"></a>
+<span class="sourceLineNo">328</span>                            markCol = 0;<a name="line.328"></a>
+<span class="sourceLineNo">329</span>                            System.out.println("Now generating new coordinates...");<a name="line.329"></a>
+<span class="sourceLineNo">330</span>                            Wait(250);<a name="line.330"></a>
+<span class="sourceLineNo">331</span>                            // Generates new random coordinates (within the gameboard's boundaries) for the computer player's mark.<a name="line.331"></a>
+<span class="sourceLineNo">332</span>                            markCol = (int) (Math.random() * gameboardWidth +1);<a name="line.332"></a>
+<span class="sourceLineNo">333</span>                            markRow = (int) (Math.random() * gameboardHeight +1);<a name="line.333"></a>
+<span class="sourceLineNo">334</span><a name="line.334"></a>
+<span class="sourceLineNo">335</span>                        } while (Gameboard[markRow-1][markCol-1] == markPlayer || Gameboard[markRow-1][markCol-1] == markCPU);<a name="line.335"></a>
+<span class="sourceLineNo">336</span>                    } else {<a name="line.336"></a>
+<span class="sourceLineNo">337</span>                    System.out.println();<a name="line.337"></a>
+<span class="sourceLineNo">338</span>                    Gameboard[markRow-1][markCol-1] = markCPU;<a name="line.338"></a>
+<span class="sourceLineNo">339</span>                    break boardloop;<a name="line.339"></a>
+<span class="sourceLineNo">340</span>                    }<a name="line.340"></a>
+<span class="sourceLineNo">341</span>                }<a name="line.341"></a>
+<span class="sourceLineNo">342</span>            }<a name="line.342"></a>
+<span class="sourceLineNo">343</span>        }<a name="line.343"></a>
+<span class="sourceLineNo">344</span>        // Prints the updated gameboard, with the current player's mark placed in it.<a name="line.344"></a>
+<span class="sourceLineNo">345</span>        for (int x = 0; x &lt; Gameboard.length; x++) {<a name="line.345"></a>
+<span class="sourceLineNo">346</span>            System.out.print(" ");<a name="line.346"></a>
+<span class="sourceLineNo">347</span>            for (int y = 0; y &lt; Gameboard[x].length; y++) {<a name="line.347"></a>
+<span class="sourceLineNo">348</span>                System.out.print(Gameboard[x][y] + " ");<a name="line.348"></a>
+<span class="sourceLineNo">349</span>            }<a name="line.349"></a>
+<span class="sourceLineNo">350</span>            System.out.println();<a name="line.350"></a>
+<span class="sourceLineNo">351</span>        }<a name="line.351"></a>
+<span class="sourceLineNo">352</span>        // Notifies where the user/computer placed their makrs.<a name="line.352"></a>
+<span class="sourceLineNo">353</span>        // If it was the human player's turn:<a name="line.353"></a>
+<span class="sourceLineNo">354</span>        if (whichPlayer == 0) {<a name="line.354"></a>
+<span class="sourceLineNo">355</span>            System.out.println();<a name="line.355"></a>
+<span class="sourceLineNo">356</span>            System.out.println("You placed your mark on " + "ROW: " + markRow + ", " + "COLUMN: " + markCol);<a name="line.356"></a>
+<span class="sourceLineNo">357</span>        // If it was the computer player's turn:<a name="line.357"></a>
+<span class="sourceLineNo">358</span>        } else {<a name="line.358"></a>
+<span class="sourceLineNo">359</span>            System.out.println();<a name="line.359"></a>
+<span class="sourceLineNo">360</span>            System.out.println("The computer placed their mark on " + "ROW: " + markRow + ", " + "COLUMN: " + markCol);<a name="line.360"></a>
+<span class="sourceLineNo">361</span>        }<a name="line.361"></a>
+<span class="sourceLineNo">362</span>    }<a name="line.362"></a>
+<span class="sourceLineNo">363</span><a name="line.363"></a>
+<span class="sourceLineNo">364</span>    /**<a name="line.364"></a>
+<span class="sourceLineNo">365</span>     * Checks if the marks placed by the user/computer form a horizontal, vertical or a diagonal line,<a name="line.365"></a>
+<span class="sourceLineNo">366</span>     * containing an equal amount of that player's marks to the user defined amount of marks required to win the game.<a name="line.366"></a>
+<span class="sourceLineNo">367</span>     *<a name="line.367"></a>
+<span class="sourceLineNo">368</span>     * The loops do this by first going the gameboard through with for-loops and then utilising if-else to check,<a name="line.368"></a>
+<span class="sourceLineNo">369</span>     * if the current mark is a mark placed by either of the palyers. If it is, the markCount increases with +1 until<a name="line.369"></a>
+<span class="sourceLineNo">370</span>     * an empty mark is checked or the required amount of marks is achieved. markCount is reset when it comes across a '-'.<a name="line.370"></a>
+<span class="sourceLineNo">371</span>     *<a name="line.371"></a>
+<span class="sourceLineNo">372</span>     * @return either a mark of a player (that also determines the winner), or an empty mark if no winner is found<a name="line.372"></a>
+<span class="sourceLineNo">373</span>     */<a name="line.373"></a>
+<span class="sourceLineNo">374</span>    public static char CheckWins() {<a name="line.374"></a>
+<span class="sourceLineNo">375</span>        // Keeps track of the amount of marks found in a horizontal, vertical or a diagonal line.<a name="line.375"></a>
+<span class="sourceLineNo">376</span>        int markCount = 0;<a name="line.376"></a>
+<span class="sourceLineNo">377</span>        // The last mark that was checked by the loop.<a name="line.377"></a>
+<span class="sourceLineNo">378</span>        char markLast = markEmpty;<a name="line.378"></a>
+<span class="sourceLineNo">379</span>        // Goes through the gameboard and checks for HORIZONTAL WINS.<a name="line.379"></a>
+<span class="sourceLineNo">380</span>        for (int x = 0; x &lt; gameboardHeight; x++) {<a name="line.380"></a>
+<span class="sourceLineNo">381</span>            for (int y = 0; y &lt; gameboardWidth; y++) {<a name="line.381"></a>
+<span class="sourceLineNo">382</span>                // If the last mark checked was something else than a '-'.<a name="line.382"></a>
+<span class="sourceLineNo">383</span>                if (Gameboard[x][y] != markEmpty) {<a name="line.383"></a>
+<span class="sourceLineNo">384</span>                    // If the last mark checked also the same player's mark, markCount goes up by 1.<a name="line.384"></a>
+<span class="sourceLineNo">385</span>                    if (Gameboard[x][y] == markLast) {<a name="line.385"></a>
+<span class="sourceLineNo">386</span>                        markCount++;<a name="line.386"></a>
+<span class="sourceLineNo">387</span>                    } else {<a name="line.387"></a>
+<span class="sourceLineNo">388</span>                        // Mark count is kept at one, if there was just a singular player mark.<a name="line.388"></a>
+<span class="sourceLineNo">389</span>                        markCount = 1;<a name="line.389"></a>
+<span class="sourceLineNo">390</span>                        markLast  = Gameboard[x][y];<a name="line.390"></a>
+<span class="sourceLineNo">391</span>                    }<a name="line.391"></a>
+<span class="sourceLineNo">392</span>                    // If the amounts of subsequent marks equal the marks required to win,<a name="line.392"></a>
+<span class="sourceLineNo">393</span>                    // changes the boolean value of hasWon to true (thus ending the game)<a name="line.393"></a>
+<span class="sourceLineNo">394</span>                    // and sending the latest mark checked to main() and determining the winner.<a name="line.394"></a>
+<span class="sourceLineNo">395</span>                    if (markCount == markRequired) {<a name="line.395"></a>
+<span class="sourceLineNo">396</span>                        hasWon = true;<a name="line.396"></a>
+<span class="sourceLineNo">397</span>                        return markLast;<a name="line.397"></a>
+<span class="sourceLineNo">398</span>                    }<a name="line.398"></a>
+<span class="sourceLineNo">399</span>                } else {<a name="line.399"></a>
+<span class="sourceLineNo">400</span>                    // No wins found, resets the counter and the last mark checked to an empty one, ready for the next turn.<a name="line.400"></a>
+<span class="sourceLineNo">401</span>                    markLast = markEmpty;<a name="line.401"></a>
+<span class="sourceLineNo">402</span>                    markCount = 0;<a name="line.402"></a>
+<span class="sourceLineNo">403</span>                }<a name="line.403"></a>
+<span class="sourceLineNo">404</span>            }<a name="line.404"></a>
+<span class="sourceLineNo">405</span>            // No wins found, resets the counter and the last mark checked to an empty one, ready for the next turn.<a name="line.405"></a>
+<span class="sourceLineNo">406</span>            markLast = markEmpty;<a name="line.406"></a>
+<span class="sourceLineNo">407</span>            markCount = 0;<a name="line.407"></a>
+<span class="sourceLineNo">408</span>        }<a name="line.408"></a>
+<span class="sourceLineNo">409</span><a name="line.409"></a>
+<span class="sourceLineNo">410</span>        // Does the same thing as the loop before this, but checks for VERTICAL WINS instead.<a name="line.410"></a>
+<span class="sourceLineNo">411</span>        // x and y for-loops have swapped places, otherwise it's and identical loop with identical functions.<a name="line.411"></a>
+<span class="sourceLineNo">412</span>        for (int y = 0; y &lt; gameboardWidth; y++) {<a name="line.412"></a>
+<span class="sourceLineNo">413</span>            for (int x = 0; x &lt; gameboardHeight; x++) {<a name="line.413"></a>
+<span class="sourceLineNo">414</span>                // If the last mark checked was something else than a '-'.<a name="line.414"></a>
+<span class="sourceLineNo">415</span>                if (Gameboard[x][y] != markEmpty) {<a name="line.415"></a>
+<span class="sourceLineNo">416</span>                    // If the last mark checked also the same player's mark, markCount goes up by 1.<a name="line.416"></a>
+<span class="sourceLineNo">417</span>                    if (Gameboard[x][y] == markLast) {<a name="line.417"></a>
+<span class="sourceLineNo">418</span>                        markCount++;<a name="line.418"></a>
+<span class="sourceLineNo">419</span>                    } else {<a name="line.419"></a>
+<span class="sourceLineNo">420</span>                        // Mark count is kept at one, if there was just a singular player mark.<a name="line.420"></a>
+<span class="sourceLineNo">421</span>                        markCount = 1;<a name="line.421"></a>
+<span class="sourceLineNo">422</span>                        markLast  = Gameboard[x][y];<a name="line.422"></a>
+<span class="sourceLineNo">423</span>                    }<a name="line.423"></a>
+<span class="sourceLineNo">424</span>                    // If the amounts of subsequent marks equal the marks required to win,<a name="line.424"></a>
+<span class="sourceLineNo">425</span>                    // changes the boolean value of hasWon to true (thus ending the game)<a name="line.425"></a>
+<span class="sourceLineNo">426</span>                    // and sending the latest mark checked to main() and determining the winner.<a name="line.426"></a>
+<span class="sourceLineNo">427</span>                    if (markCount == markRequired) {<a name="line.427"></a>
+<span class="sourceLineNo">428</span>                        hasWon = true;<a name="line.428"></a>
+<span class="sourceLineNo">429</span>                        return markLast;<a name="line.429"></a>
+<span class="sourceLineNo">430</span>                    }<a name="line.430"></a>
+<span class="sourceLineNo">431</span>                } else {<a name="line.431"></a>
+<span class="sourceLineNo">432</span>                    // No wins found, resets the counter and the last mark checked to an empty one, ready for the next turn.<a name="line.432"></a>
+<span class="sourceLineNo">433</span>                    markLast = markEmpty;<a name="line.433"></a>
+<span class="sourceLineNo">434</span>                    markCount = 0;<a name="line.434"></a>
+<span class="sourceLineNo">435</span>                }<a name="line.435"></a>
+<span class="sourceLineNo">436</span>            }<a name="line.436"></a>
+<span class="sourceLineNo">437</span>            // No wins found, resets the counter and the last mark checked to an empty one, ready for the next turn.<a name="line.437"></a>
+<span class="sourceLineNo">438</span>            markLast = markEmpty;<a name="line.438"></a>
+<span class="sourceLineNo">439</span>            markCount = 0;<a name="line.439"></a>
+<span class="sourceLineNo">440</span>        }<a name="line.440"></a>
+<span class="sourceLineNo">441</span>        // Goes through the gameboard and checks for DIAGONAL WINS (from top-left to bottom-right / top-right to bottom-left).<a name="line.441"></a>
+<span class="sourceLineNo">442</span>        for (int x = 0; x &lt; gameboardHeight; x++) {<a name="line.442"></a>
+<span class="sourceLineNo">443</span>            for (int y = 0; y &lt; gameboardWidth; y++) {<a name="line.443"></a>
+<span class="sourceLineNo">444</span>                // If the last mark checked was something else than a '-'.<a name="line.444"></a>
+<span class="sourceLineNo">445</span>                if (Gameboard[x][y] != markEmpty) {<a name="line.445"></a>
+<span class="sourceLineNo">446</span>                    // If the last mark checked also the same player's mark, markCount goes up by 1.<a name="line.446"></a>
+<span class="sourceLineNo">447</span>                    if (Gameboard[x][y] == markLast) {<a name="line.447"></a>
+<span class="sourceLineNo">448</span>                        markCount++;<a name="line.448"></a>
+<span class="sourceLineNo">449</span>                    } else {<a name="line.449"></a>
+<span class="sourceLineNo">450</span>                        // Mark count is kept at one, if there was just a singular player mark.<a name="line.450"></a>
+<span class="sourceLineNo">451</span>                        // Diagonal checks are a bit trickier, so this is important...<a name="line.451"></a>
+<span class="sourceLineNo">452</span>                        markCount = 1;<a name="line.452"></a>
+<span class="sourceLineNo">453</span>                        markLast  = Gameboard[x][y];<a name="line.453"></a>
+<span class="sourceLineNo">454</span>                        // This for-loop checks for top-left to bottom-right wins, by everytime adding the integer z to the width (y) &amp; height (x)<a name="line.454"></a>
+<span class="sourceLineNo">455</span>                        // (for as long as z is smaller than marks required to win, height+z smaller than max height, and width+z smaller than max width).<a name="line.455"></a>
+<span class="sourceLineNo">456</span>                        for (int z = 1; z &lt; markRequired &amp;&amp; x+z &lt; gameboardHeight &amp;&amp; y+z &lt; gameboardWidth; z++) {<a name="line.456"></a>
+<span class="sourceLineNo">457</span>                            // If the mark found on the new coordinates equals to the last mark checked, markCount goes up by 1.<a name="line.457"></a>
+<span class="sourceLineNo">458</span>                            if (Gameboard[x+z][y+z] == markLast) {<a name="line.458"></a>
+<span class="sourceLineNo">459</span>                                markCount++;<a name="line.459"></a>
+<span class="sourceLineNo">460</span>                                // If the amounts of subsequent marks equal the marks required to win,<a name="line.460"></a>
+<span class="sourceLineNo">461</span>                                // changes the boolean value of hasWon to true (thus ending the game)<a name="line.461"></a>
+<span class="sourceLineNo">462</span>                                // and sending the latest mark checked to main() and determining the winner.<a name="line.462"></a>
+<span class="sourceLineNo">463</span>                                if (markCount == markRequired) {<a name="line.463"></a>
+<span class="sourceLineNo">464</span>                                    hasWon = true;<a name="line.464"></a>
+<span class="sourceLineNo">465</span>                                    return markLast;<a name="line.465"></a>
+<span class="sourceLineNo">466</span>                                }<a name="line.466"></a>
+<span class="sourceLineNo">467</span>                            } else {<a name="line.467"></a>
+<span class="sourceLineNo">468</span>                                break;<a name="line.468"></a>
+<span class="sourceLineNo">469</span>                            }<a name="line.469"></a>
+<span class="sourceLineNo">470</span>                        }<a name="line.470"></a>
+<span class="sourceLineNo">471</span>                        // Does the same thing as the previous loop that checked from top-left bottom-right,<a name="line.471"></a>
+<span class="sourceLineNo">472</span>                        // this one checks from top-right to bottom-left by everytime adding the integer z to the height (x) and substracting z from the width (y).<a name="line.472"></a>
+<span class="sourceLineNo">473</span>                        // (for as long as z is smaller than marks required to win, height+z smaller than max height, and width-z smaller than max width).<a name="line.473"></a>
+<span class="sourceLineNo">474</span>                        for (int z = 1; z &lt; markRequired &amp;&amp; x+z &lt; gameboardHeight &amp;&amp; y-z &lt; gameboardWidth; z++) {<a name="line.474"></a>
+<span class="sourceLineNo">475</span>                            // An additional check, that the width is equal to or greater than the marks required to win (-1),<a name="line.475"></a>
+<span class="sourceLineNo">476</span>                            // this to keep the loop from checking top-right to bottom-left victories while the mark checked is on coordinate,<a name="line.476"></a>
+<span class="sourceLineNo">477</span>                            // from where a top-right to bottom-left victory is impossible to achieve (e.g. 5 marks to win, 'X' was checked on column 3).<a name="line.477"></a>
+<span class="sourceLineNo">478</span>                            if (y &gt;= markRequired-1) {<a name="line.478"></a>
+<span class="sourceLineNo">479</span>                                // If the mark found on the new coordinates equals to the last mark checked, markCount goes up by 1.<a name="line.479"></a>
+<span class="sourceLineNo">480</span>                                if (Gameboard[x+z][y-z] == markLast) {<a name="line.480"></a>
+<span class="sourceLineNo">481</span>                                    markCount++;<a name="line.481"></a>
+<span class="sourceLineNo">482</span>                                    // If the amounts of subsequent marks equal the marks required to win,<a name="line.482"></a>
+<span class="sourceLineNo">483</span>                                    // changes the boolean value of hasWon to true (thus ending the game)<a name="line.483"></a>
+<span class="sourceLineNo">484</span>                                    // and sending the latest mark checked to main() and determining the winner<a name="line.484"></a>
+<span class="sourceLineNo">485</span>                                    if (markCount == markRequired) {<a name="line.485"></a>
+<span class="sourceLineNo">486</span>                                        hasWon = true;<a name="line.486"></a>
+<span class="sourceLineNo">487</span>                                        return markLast;<a name="line.487"></a>
+<span class="sourceLineNo">488</span>                                    }<a name="line.488"></a>
+<span class="sourceLineNo">489</span>                                } else {<a name="line.489"></a>
+<span class="sourceLineNo">490</span>                                    break;<a name="line.490"></a>
+<span class="sourceLineNo">491</span>                                }<a name="line.491"></a>
+<span class="sourceLineNo">492</span>                            }<a name="line.492"></a>
+<span class="sourceLineNo">493</span>                        }<a name="line.493"></a>
+<span class="sourceLineNo">494</span>                        // No wins found, resets the counter and the last mark checked to an empty one, ready for the next turn.<a name="line.494"></a>
+<span class="sourceLineNo">495</span>                        markLast = markEmpty;<a name="line.495"></a>
+<span class="sourceLineNo">496</span>                        markCount = 0;<a name="line.496"></a>
+<span class="sourceLineNo">497</span>                    }<a name="line.497"></a>
+<span class="sourceLineNo">498</span>                }<a name="line.498"></a>
+<span class="sourceLineNo">499</span>            }<a name="line.499"></a>
+<span class="sourceLineNo">500</span>        }<a name="line.500"></a>
+<span class="sourceLineNo">501</span>        // If no wins are found, returns an empty mark from the board.<a name="line.501"></a>
+<span class="sourceLineNo">502</span>        return markEmpty;<a name="line.502"></a>
+<span class="sourceLineNo">503</span>    }<a name="line.503"></a>
+<span class="sourceLineNo">504</span><a name="line.504"></a>
+<span class="sourceLineNo">505</span>    /**<a name="line.505"></a>
+<span class="sourceLineNo">506</span>     * Checks if the board is full or not.<a name="line.506"></a>
+<span class="sourceLineNo">507</span>     * @return is the gameboard full and no more turns are possible, equaling in a draw.<a name="line.507"></a>
+<span class="sourceLineNo">508</span>     */<a name="line.508"></a>
+<span class="sourceLineNo">509</span>    public static boolean FullBoard() {<a name="line.509"></a>
+<span class="sourceLineNo">510</span>        // By default, the value to return is "true".<a name="line.510"></a>
+<span class="sourceLineNo">511</span>        isDraw = true;<a name="line.511"></a>
+<span class="sourceLineNo">512</span>        // Goes through the board with for-loops, checking if empty marks are found.<a name="line.512"></a>
+<span class="sourceLineNo">513</span>        for (int x = 0; x &lt; gameboardHeight; x++) {<a name="line.513"></a>
+<span class="sourceLineNo">514</span>            for (int y = 0; y &lt; gameboardWidth; y++) {<a name="line.514"></a>
+<span class="sourceLineNo">515</span>                if (Gameboard[x][y] == markEmpty) {<a name="line.515"></a>
+<span class="sourceLineNo">516</span>                    // Empty marks found, changes the value of isDraw to "false".<a name="line.516"></a>
+<span class="sourceLineNo">517</span>                    isDraw = false;<a name="line.517"></a>
+<span class="sourceLineNo">518</span>                }<a name="line.518"></a>
+<span class="sourceLineNo">519</span>            }<a name="line.519"></a>
+<span class="sourceLineNo">520</span>        }<a name="line.520"></a>
+<span class="sourceLineNo">521</span>        // Returns the value of isDraw to main().<a name="line.521"></a>
+<span class="sourceLineNo">522</span>        return isDraw;<a name="line.522"></a>
+<span class="sourceLineNo">523</span>    }<a name="line.523"></a>
+<span class="sourceLineNo">524</span><a name="line.524"></a>
+<span class="sourceLineNo">525</span>    /**<a name="line.525"></a>
+<span class="sourceLineNo">526</span>     * A nifty little "extra" method, used to add small delays in the code. <a name="line.526"></a>
+<span class="sourceLineNo">527</span>     * The reason for this was already explained in the beginning of the code (line 43),<a name="line.527"></a>
+<span class="sourceLineNo">528</span>     * but it's mainly to help with the user experience, by easing the pacing of the output a little bit.<a name="line.528"></a>
+<span class="sourceLineNo">529</span>     * @param time the amount of milliseconds to wait<a name="line.529"></a>
+<span class="sourceLineNo">530</span>     */<a name="line.530"></a>
+<span class="sourceLineNo">531</span>    public static void Wait (int time) {<a name="line.531"></a>
+<span class="sourceLineNo">532</span>        try {<a name="line.532"></a>
+<span class="sourceLineNo">533</span>            Thread.sleep(time);<a name="line.533"></a>
+<span class="sourceLineNo">534</span>        } catch (InterruptedException ex) {<a name="line.534"></a>
+<span class="sourceLineNo">535</span>            Thread.currentThread().interrupt();<a name="line.535"></a>
+<span class="sourceLineNo">536</span>        }<a name="line.536"></a>
+<span class="sourceLineNo">537</span>    }<a name="line.537"></a>
+<span class="sourceLineNo">538</span><a name="line.538"></a>
+<span class="sourceLineNo">539</span>}<a name="line.539"></a>
+<span class="sourceLineNo">540</span><a name="line.540"></a>
+<span class="sourceLineNo">541</span>/**<a name="line.541"></a>
+<span class="sourceLineNo">542</span> * Validate - The class processes user input, depending on the situation, through different methods to validate it to an appropriately sized integer.<a name="line.542"></a>
+<span class="sourceLineNo">543</span> *<a name="line.543"></a>
+<span class="sourceLineNo">544</span> * @author Kalle Lindevall<a name="line.544"></a>
+<span class="sourceLineNo">545</span> * @version 2018.1<a name="line.545"></a>
+<span class="sourceLineNo">546</span>*/<a name="line.546"></a>
+<span class="sourceLineNo">547</span>class Validate {<a name="line.547"></a>
+<span class="sourceLineNo">548</span><a name="line.548"></a>
+<span class="sourceLineNo">549</span>    /**<a name="line.549"></a>
+<span class="sourceLineNo">550</span>     * This loop checks the user input for the size of the gameboard.<a name="line.550"></a>
+<span class="sourceLineNo">551</span>     * @param numToCheck either the value for the height or the width of the gameboard<a name="line.551"></a>
+<span class="sourceLineNo">552</span>     * @return an integer equal to or bigger than 3, for either gameboardHeight or gameboardWidth<a name="line.552"></a>
+<span class="sourceLineNo">553</span>     */<a name="line.553"></a>
+<span class="sourceLineNo">554</span>    public static int numBoard(int numToCheck) {<a name="line.554"></a>
+<span class="sourceLineNo">555</span>        Scanner input = new Scanner(System.in);<a name="line.555"></a>
+<span class="sourceLineNo">556</span>        // While the number input by the user is under 3, a decimal number or not a number at all.<a name="line.556"></a>
+<span class="sourceLineNo">557</span>        while (numToCheck &lt; 3) {<a name="line.557"></a>
+<span class="sourceLineNo">558</span>            // Checks if the value input by the user is an integer.<a name="line.558"></a>
+<span class="sourceLineNo">559</span>            try {<a name="line.559"></a>
+<span class="sourceLineNo">560</span>                numToCheck = Integer.parseInt(input.nextLine().trim());<a name="line.560"></a>
+<span class="sourceLineNo">561</span>                System.out.println();<a name="line.561"></a>
+<span class="sourceLineNo">562</span>            } catch (NumberFormatException e) {<a name="line.562"></a>
+<span class="sourceLineNo">563</span>                System.out.println();<a name="line.563"></a>
+<span class="sourceLineNo">564</span>                System.out.println("ERROR: Only (whole) numbers are valid.");<a name="line.564"></a>
+<span class="sourceLineNo">565</span>                System.out.println();<a name="line.565"></a>
+<span class="sourceLineNo">566</span>                continue;<a name="line.566"></a>
+<span class="sourceLineNo">567</span>            }<a name="line.567"></a>
+<span class="sourceLineNo">568</span>            // If the number input by the user is an integer, but too small, proceeds to ask for a different value.<a name="line.568"></a>
+<span class="sourceLineNo">569</span>            if (numToCheck &lt; 3) {<a name="line.569"></a>
+<span class="sourceLineNo">570</span>                System.out.println("ERROR: Please give a valid number.");<a name="line.570"></a>
+<span class="sourceLineNo">571</span>                System.out.println();<a name="line.571"></a>
+<span class="sourceLineNo">572</span>            }<a name="line.572"></a>
+<span class="sourceLineNo">573</span>        }<a name="line.573"></a>
+<span class="sourceLineNo">574</span>        // Returns the validated integer as a value for either gameboardHeight or gameboardWidth, depending on what method was this method called from.<a name="line.574"></a>
+<span class="sourceLineNo">575</span>        return numToCheck;<a name="line.575"></a>
+<span class="sourceLineNo">576</span>    }<a name="line.576"></a>
+<span class="sourceLineNo">577</span><a name="line.577"></a>
+<span class="sourceLineNo">578</span>    /**<a name="line.578"></a>
+<span class="sourceLineNo">579</span>     * This loop checks the user input for the marks required to win the game.<a name="line.579"></a>
+<span class="sourceLineNo">580</span>     * @param numToCheck the user input value for the marks required to win<a name="line.580"></a>
+<span class="sourceLineNo">581</span>     * @param numWidth value of the width of the gameboard, that is compared to the value of the height<a name="line.581"></a>
+<span class="sourceLineNo">582</span>     * @param numHeight value of the height of the gameboard, that is compared to the value of the width<a name="line.582"></a>
+<span class="sourceLineNo">583</span>     * @return an integer that is 3 or bigger and equal or smaller than the shorter side of the gameboard<a name="line.583"></a>
+<span class="sourceLineNo">584</span>     */<a name="line.584"></a>
+<span class="sourceLineNo">585</span>    public static int numMark(int numToCheck, int numWidth, int numHeight) {<a name="line.585"></a>
+<span class="sourceLineNo">586</span>        Scanner input = new Scanner(System.in);<a name="line.586"></a>
+<span class="sourceLineNo">587</span><a name="line.587"></a>
+<span class="sourceLineNo">588</span>        // The value of the shorter side of the gameboard<a name="line.588"></a>
+<span class="sourceLineNo">589</span>        int shorter = 0;<a name="line.589"></a>
+<span class="sourceLineNo">590</span><a name="line.590"></a>
+<span class="sourceLineNo">591</span>        // Compares the values of the width and height of the gameboard, determining which is smaller.<a name="line.591"></a>
+<span class="sourceLineNo">592</span>        if (numWidth &lt; numHeight) {<a name="line.592"></a>
+<span class="sourceLineNo">593</span>            shorter = numWidth;<a name="line.593"></a>
+<span class="sourceLineNo">594</span>        } else {<a name="line.594"></a>
+<span class="sourceLineNo">595</span>            shorter = numHeight;<a name="line.595"></a>
+<span class="sourceLineNo">596</span>        }        <a name="line.596"></a>
+<span class="sourceLineNo">597</span>        // While the number input by the user is under 3, bigger than the shorter side of the gameboard, a decimal number or not a number at all.<a name="line.597"></a>
+<span class="sourceLineNo">598</span>        while (numToCheck &lt; 3 || numToCheck &gt; shorter) {<a name="line.598"></a>
+<span class="sourceLineNo">599</span>            // Checks if the value input by the user is an integer.<a name="line.599"></a>
+<span class="sourceLineNo">600</span>            try {<a name="line.600"></a>
+<span class="sourceLineNo">601</span>                numToCheck = Integer.parseInt(input.nextLine().trim());<a name="line.601"></a>
+<span class="sourceLineNo">602</span>                System.out.println();<a name="line.602"></a>
+<span class="sourceLineNo">603</span>            } catch (NumberFormatException e) {<a name="line.603"></a>
+<span class="sourceLineNo">604</span>                System.out.println();<a name="line.604"></a>
+<span class="sourceLineNo">605</span>                System.out.println("ERROR: Only (whole) numbers are valid.");<a name="line.605"></a>
+<span class="sourceLineNo">606</span>                System.out.println();<a name="line.606"></a>
+<span class="sourceLineNo">607</span>                continue;<a name="line.607"></a>
+<span class="sourceLineNo">608</span>            }<a name="line.608"></a>
+<span class="sourceLineNo">609</span>            // If the number input by the user is an integer, but too small or big, proceeds to ask for a different value.<a name="line.609"></a>
+<span class="sourceLineNo">610</span>            if (numToCheck &lt; 3 || numToCheck &gt; shorter) {<a name="line.610"></a>
+<span class="sourceLineNo">611</span>                System.out.println("ERROR: Please give a valid number.");<a name="line.611"></a>
+<span class="sourceLineNo">612</span>                System.out.println();<a name="line.612"></a>
+<span class="sourceLineNo">613</span>            }<a name="line.613"></a>
+<span class="sourceLineNo">614</span>        }<a name="line.614"></a>
+<span class="sourceLineNo">615</span>        // Returns the validated integer as a value for the marks required to win the game.<a name="line.615"></a>
+<span class="sourceLineNo">616</span>        return numToCheck;<a name="line.616"></a>
+<span class="sourceLineNo">617</span>    }<a name="line.617"></a>
+<span class="sourceLineNo">618</span><a name="line.618"></a>
+<span class="sourceLineNo">619</span>    /**<a name="line.619"></a>
+<span class="sourceLineNo">620</span>     * This loop checks the user input values for the coordinates for the human player's mark.<a name="line.620"></a>
+<span class="sourceLineNo">621</span>     * @param numToCheck the user input value for either the column or the row coordinate for their mark<a name="line.621"></a>
+<span class="sourceLineNo">622</span>     * @param compareBoard value of the width/height of the gameboard, that is compared to the column/row coordinate input by the user<a name="line.622"></a>
+<span class="sourceLineNo">623</span>     * @return an integer that is 3 or bigger and equal or smaller than the shorter side of the gameboard<a name="line.623"></a>
+<span class="sourceLineNo">624</span>     */<a name="line.624"></a>
+<span class="sourceLineNo">625</span>    public static int numPlay(int numToCheck, int compareBoard) {<a name="line.625"></a>
+<span class="sourceLineNo">626</span>        Scanner input = new Scanner(System.in);<a name="line.626"></a>
+<span class="sourceLineNo">627</span>        // While the number input by the user is under 0 or smaller, or bigger than the corresponding size of the gameboard (width/column or height/row)<a name="line.627"></a>
+<span class="sourceLineNo">628</span>        while (numToCheck &lt;= 0 || numToCheck &gt; compareBoard) {<a name="line.628"></a>
+<span class="sourceLineNo">629</span>            // Checks if the value input by the user is an integer.<a name="line.629"></a>
+<span class="sourceLineNo">630</span>            try {<a name="line.630"></a>
+<span class="sourceLineNo">631</span>                numToCheck = Integer.parseInt(input.nextLine().trim());<a name="line.631"></a>
+<span class="sourceLineNo">632</span>                System.out.println();<a name="line.632"></a>
+<span class="sourceLineNo">633</span>            } catch (NumberFormatException e) {<a name="line.633"></a>
+<span class="sourceLineNo">634</span>                System.out.println();<a name="line.634"></a>
+<span class="sourceLineNo">635</span>                System.out.println("ERROR: Only (whole) numbers are valid.");<a name="line.635"></a>
+<span class="sourceLineNo">636</span>                System.out.println();;<a name="line.636"></a>
+<span class="sourceLineNo">637</span>                continue;<a name="line.637"></a>
+<span class="sourceLineNo">638</span>            }<a name="line.638"></a>
+<span class="sourceLineNo">639</span>            // If the number input by the user is an integer, but too small or big, proceeds to ask for a different value.<a name="line.639"></a>
+<span class="sourceLineNo">640</span>            if (numToCheck &lt;= 0 || numToCheck &gt; compareBoard) {<a name="line.640"></a>
+<span class="sourceLineNo">641</span>                System.out.println("ERROR: Please give a valid number.");<a name="line.641"></a>
+<span class="sourceLineNo">642</span>                System.out.println();<a name="line.642"></a>
+<span class="sourceLineNo">643</span>            }<a name="line.643"></a>
+<span class="sourceLineNo">644</span>        }<a name="line.644"></a>
+<span class="sourceLineNo">645</span>        // Returns the validated integer as a value for the row/column coordinate for the human player's mark.<a name="line.645"></a>
+<span class="sourceLineNo">646</span>        return numToCheck;<a name="line.646"></a>
+<span class="sourceLineNo">647</span>    }<a name="line.647"></a>
+<span class="sourceLineNo">648</span>}<a name="line.648"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</body>
+</html>
